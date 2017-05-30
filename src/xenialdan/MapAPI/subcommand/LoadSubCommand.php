@@ -10,7 +10,7 @@ use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use xenialdan\MapAPI\Color;
-use xenialdan\MapAPI\Map;
+use xenialdan\MapAPI\Item\Map;
 use xenialdan\MapAPI\MapUtils;
 
 class LoadSubCommand extends SubCommand
