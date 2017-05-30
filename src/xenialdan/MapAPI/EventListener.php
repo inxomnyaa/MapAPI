@@ -11,4 +11,5 @@ class EventListener implements Listener{
 	public function __construct(Plugin $plugin){
 		$this->owner = $plugin;
 	}
+	//TODO listen for packet, probably load from nbt/make new map
 }

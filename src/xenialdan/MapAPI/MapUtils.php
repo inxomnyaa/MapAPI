@@ -27,17 +27,17 @@ use pocketmine\block\Prismarine;
 use pocketmine\block\Slab;
 use pocketmine\block\Slab2;
 use pocketmine\block\Stone;
-use pocketmine\item\Dye;
-use pocketmine\item\Map;
+use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
-class MapUtils{
+class MapUtils{//actual name of the "tool"
 
 	/** @var Color[] */
 	public static $BaseMapColors = [];
@@ -218,9 +218,9 @@ class MapUtils{
 			case Block::LILY_PAD:
 				return new Color(0, 124, 0);
 				break;
-			case Block::WOOL && $meta == Dye::WHITE:
-			case Block::CARPET && $meta == Dye::WHITE:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::WHITE:
+			case Block::WOOL && $meta == Color::COLOR_DYE_WHITE:
+			case Block::CARPET && $meta == Color::COLOR_DYE_WHITE:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_WHITE:
 			case Block::SNOW_LAYER:
 			case Block::SNOW_BLOCK:
 				return new Color(255, 255, 255);
@@ -319,9 +319,9 @@ class MapUtils{
 			case Block::SEA_LANTERN:
 				return new Color(255, 252, 245);
 				break;
-			case Block::WOOL && $meta == Dye::ORANGE:
-			case Block::CARPET && $meta == Dye::ORANGE:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::ORANGE:
+			case Block::WOOL && $meta == Color::COLOR_DYE_ORANGE:
+			case Block::CARPET && $meta == Color::COLOR_DYE_ORANGE:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_ORANGE:
 			case Block::PUMPKIN:
 			case Block::JACK_O_LANTERN:
 			case Block::HARDENED_CLAY:
@@ -333,72 +333,72 @@ class MapUtils{
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::ACACIA:
 				return new Color(216, 127, 51);
 				break;
-			case Block::WOOL && $meta == Dye::MAGENTA:
-			case Block::CARPET && $meta == Dye::MAGENTA:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::MAGENTA:
+			case Block::WOOL && $meta == Color::COLOR_DYE_MAGENTA:
+			case Block::CARPET && $meta == Color::COLOR_DYE_MAGENTA:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_MAGENTA:
 			case Block::PURPUR:
 			case Block::PURPUR_STAIRS:
 			case Block::SLAB2 && ($meta & 0x07) == Slab2::PURPUR:
 				return new Color(178, 76, 216);
 				break;
-			case Block::WOOL && $meta == Dye::LIGHT_BLUE:
-			case Block::CARPET && $meta == Dye::LIGHT_BLUE:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::LIGHT_BLUE:
+			case Block::WOOL && $meta == Color::COLOR_DYE_LIGHT_BLUE:
+			case Block::CARPET && $meta == Color::COLOR_DYE_LIGHT_BLUE:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_LIGHT_BLUE:
 				return new Color(102, 153, 216);
 				break;
-			case Block::WOOL && $meta == Dye::YELLOW:
-			case Block::CARPET && $meta == Dye::YELLOW:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::YELLOW:
+			case Block::WOOL && $meta == Color::COLOR_DYE_YELLOW:
+			case Block::CARPET && $meta == Color::COLOR_DYE_YELLOW:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_YELLOW:
 			case Block::HAY_BALE:
 			case Block::SPONGE:
 				return new Color(229, 229, 51);
 				break;
-			case Block::WOOL && $meta == Dye::LIME:
-			case Block::CARPET && $meta == Dye::LIME:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::LIME:
+			case Block::WOOL && $meta == Color::COLOR_DYE_LIME:
+			case Block::CARPET && $meta == Color::COLOR_DYE_LIME:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_LIME:
 			case Block::MELON_BLOCK:
 				return new Color(229, 229, 51);
 				break;
-			case Block::WOOL && $meta == Dye::PINK:
-			case Block::CARPET && $meta == Dye::PINK:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::PINK:
+			case Block::WOOL && $meta == Color::COLOR_DYE_PINK:
+			case Block::CARPET && $meta == Color::COLOR_DYE_PINK:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_PINK:
 				return new Color(242, 127, 165);
 				break;
-			case Block::WOOL && $meta == Dye::GRAY:
-			case Block::CARPET && $meta == Dye::GRAY:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::GRAY:
+			case Block::WOOL && $meta == Color::COLOR_DYE_GRAY:
+			case Block::CARPET && $meta == Color::COLOR_DYE_GRAY:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_GRAY:
 			case Block::CAULDRON_BLOCK:
 				return new Color(76, 76, 76);
 				break;
-			case Block::WOOL && $meta == Dye::LIGHT_GRAY:
-			case Block::CARPET && $meta == Dye::LIGHT_GRAY:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::LIGHT_GRAY:
+			case Block::WOOL && $meta == Color::COLOR_DYE_LIGHT_GRAY:
+			case Block::CARPET && $meta == Color::COLOR_DYE_LIGHT_GRAY:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_LIGHT_GRAY:
 				#case Block::STRUCTURE_BLOCK:
 				return new Color(153, 153, 153);
 				break;
-			case Block::WOOL && $meta == Dye::CYAN:
-			case Block::CARPET && $meta == Dye::CYAN:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::CYAN:
+			case Block::WOOL && $meta == Color::COLOR_DYE_CYAN:
+			case Block::CARPET && $meta == Color::COLOR_DYE_CYAN:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_CYAN:
 			case Block::PRISMARINE && $meta == Prismarine::NORMAL:
 				return new Color(76, 127, 153);
 				break;
-			case Block::WOOL && $meta == Dye::PURPLE:
-			case Block::CARPET && $meta == Dye::PURPLE:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::PURPLE:
+			case Block::WOOL && $meta == Color::COLOR_DYE_PURPLE:
+			case Block::CARPET && $meta == Color::COLOR_DYE_PURPLE:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_PURPLE:
 			case Block::MYCELIUM:
 				#case Block::COMMAND_BLOCK://meta = repeating
 			case Block::CHORUS_PLANT:
 			case Block::CHORUS_FLOWER:
 				return new Color(127, 63, 178);
 				break;
-			case Block::WOOL && $meta == Dye::DARK_BLUE:
-			case Block::CARPET && $meta == Dye::DARK_BLUE:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::DARK_BLUE:
+			case Block::WOOL && $meta == Color::COLOR_DYE_BLUE:
+			case Block::CARPET && $meta == Color::COLOR_DYE_BLUE:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_BLUE:
 				return new Color(51, 76, 178);
 				break;
-			case Block::WOOL && $meta == Dye::BROWN:
-			case Block::CARPET && $meta == Dye::BROWN:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::BROWN:
+			case Block::WOOL && $meta == Color::COLOR_DYE_BROWN:
+			case Block::CARPET && $meta == Color::COLOR_DYE_BROWN:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_BROWN:
 			case Block::SOUL_SAND:
 			case Block::WOOD && $meta == Planks::DARK_OAK:
 			case Block::PLANK && $meta == Planks::DARK_OAK:
@@ -409,16 +409,16 @@ class MapUtils{
 				#case Block::COMMAND_BLOCK://meta = impulse
 				return new Color(102, 76, 51);
 				break;
-			case Block::WOOL && $meta == Dye::GREEN:
-			case Block::CARPET && $meta == Dye::GREEN:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::GREEN:
+			case Block::WOOL && $meta == Color::COLOR_DYE_GREEN:
+			case Block::CARPET && $meta == Color::COLOR_DYE_GREEN:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_GREEN:
 			case Block::END_PORTAL_FRAME:
 				#case Block::COMMAND_BLOCK://meta = chain
 				return new Color(102, 127, 51);
 				break;
-			case Block::WOOL && $meta == Dye::RED:
-			case Block::CARPET && $meta == Dye::RED:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::RED:
+			case Block::WOOL && $meta == Color::COLOR_DYE_RED:
+			case Block::CARPET && $meta == Color::COLOR_DYE_RED:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_RED:
 			case Block::RED_MUSHROOM_BLOCK://todo: meta
 			case Block::BRICKS:
 			case Block::STONE_SLAB && ($meta & 0x07) == Slab::BRICK:
@@ -428,9 +428,9 @@ class MapUtils{
 				#case Block::NETHER_WART_BLOCK://For the future: a block with this name will be introduced soon!
 				return new Color(153, 51, 51);
 				break;
-			case Block::WOOL && $meta == Dye::BLACK:
-			case Block::CARPET && $meta == Dye::BLACK:
-			case Block::STAINED_HARDENED_CLAY && $meta == Dye::BLACK:
+			case Block::WOOL && $meta == Color::COLOR_DYE_BLACK:
+			case Block::CARPET && $meta == Color::COLOR_DYE_BLACK:
+			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_BLACK:
 			case Block::DRAGON_EGG:
 			case Block::COAL_BLOCK:
 			case Block::OBSIDIAN:
@@ -513,16 +513,39 @@ class MapUtils{
 				}
 			}
 		}
+		$nbt = new NBT(NBT::BIG_ENDIAN);
 		$t = new CompoundTag($name,
 			new CompoundTag("data", new ShortTag("width", $map->getWidth()),
 				new ShortTag("height", $map->getHeight()),
 				new ByteTag("scale", $map->getScale()),
-				new ByteTag("dimension", 0),//todo
-				new IntTag("xCenter", $map->xOffset),
-				new IntTag("zCenter", $map->yOffset),
-				new ByteArrayTag("colors", $data)));
-		return $t;
+				new ByteTag("fullyExplored", 1),//to have transparency instead of the map background
+				new ByteTag("dimension", 0),//maybe todo
+				new IntTag("xCenter", 0),//maybe todo
+				new IntTag("zCenter", 0),//maybe todo
+				new ByteArrayTag("colors", $data),
+				new ListTag("decorations", [])
+			)
+		);
+		$nbt->setData($t);
+		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId(), $nbt->writeCompressed());
+		return touch(Loader::$path['maps'] . '/map_' . $map->getMapId());
 	}
+	
+	public function loadFromNBT($id){
+		$path = Loader::$path['maps'] . '/map_' . $id;
+		if (!touch($path)) return false;
+		$map = new Map();
+		$nbt = new NBT(NBT::BIG_ENDIAN);
+		$nbt->readCompressed(file_get_contents($path));
+		$data = $nbt->getData();
+		#Server::getInstance()->getLogger()->debug(var_export($data, true));
+		$map->setWidth($data->width->getValue());
+		$map->setHeight($data->height->getValue());
+		$map->setXOffset($data->xCenter->getValue());
+		$map->setYOffset($data->zCenter->getValue());
+		$map->setColors($data->colors->getValue());
+		//deco
+}
 
 	public function getMapColors(){//TODO: make static
 		return self::$MapColors;

@@ -6,8 +6,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
-use xenialdan\MapUtils\subcommand\LoadSubCommand;
-use xenialdan\MapUtils\subcommand\SubCommand;
+use xenialdan\MapAPI\subcommand\LoadSubCommand;
+use xenialdan\MapAPI\subcommand\SubCommand;
 
 class Commands extends PluginCommand
 {

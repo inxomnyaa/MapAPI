@@ -4,16 +4,14 @@ namespace xenialdan\MapAPI\subcommand;
 
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
-use pocketmine\item\Map;
-use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\protocol\ClientboundMapItemDataPacket;
+use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
-use pocketmine\utils\Color;
-use pocketmine\utils\Config;
-use pocketmine\utils\MapUtils;
 use pocketmine\utils\TextFormat;
+use xenialdan\MapAPI\Color;
+use xenialdan\MapAPI\Map;
+use xenialdan\MapAPI\MapUtils;
 
 class LoadSubCommand extends SubCommand
 {

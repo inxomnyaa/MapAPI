@@ -1,6 +1,6 @@
 <?php
 
-namespace pocketmine\item;
+namespace xenialdan\MapAPI;
 
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
@@ -142,6 +142,6 @@ class Map {
 	}
 
 	public function save() {
-		//TODO.
+		//TODO. -> see maputils export
 	}
 }
