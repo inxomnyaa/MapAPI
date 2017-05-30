@@ -1,0 +1,8 @@
+  name: MapAPI
+  main: xenialdan\MapAPI\Loader
+  version: 0.1.0
+  api: ['*', '3.0.0-ALPHA5']
+#TODO change to alpha 6 asap
+  load: POSTWORLD
+  authors: [XenialDan]
+  prefix: "MapAPI by XenialDan"
