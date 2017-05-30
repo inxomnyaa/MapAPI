@@ -4,15 +4,14 @@ namespace xenialdan\MapAPI\subcommand;
 
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
-use pocketmine\item\Map;
+use xenialdan\MapAPI\item\Map;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\protocol\ClientboundMapItemDataPacket;
+use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
-use pocketmine\utils\Color;
-use pocketmine\utils\Config;
-use pocketmine\utils\MapUtils;
+use xenialdan\MapAPI\CColor;
+use xenialdan\MapAPI\MapUtils;
 use pocketmine\utils\TextFormat;
 
 class LoadSubCommand extends SubCommand
@@ -74,7 +73,7 @@ class LoadSubCommand extends SubCommand
 			for ($y = 0; $y < $height; ++$y) {
 				for ($x = 0; $x < $width; ++$x) {
 					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-					$colors[$y][$x] = $mapUtils->getClosestMapColor(new Color($color['red'],$color['green'],$color['blue'],$color['alpha']));
+					$colors[$y][$x] = $mapUtils->getClosestMapColor(new CColor($color['red'],$color['green'],$color['blue'],$color['alpha']));
 				}
 			}
 			$map = new Map($id = MapUtils::getNewId(), $colors, 1, $width, $height);
