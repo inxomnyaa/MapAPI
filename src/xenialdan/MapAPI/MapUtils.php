@@ -36,6 +36,7 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use xenialdan\MapAPI\item\Map;
 
 class MapUtils{//actual name of the "tool"
 
