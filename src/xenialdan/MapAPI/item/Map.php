@@ -1,6 +1,6 @@
 <?php
 
-namespace pocketmine\item;
+namespace xenialdan\MapAPI\item;
 
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
