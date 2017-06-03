@@ -13,15 +13,14 @@ use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
+use xenialdan\MapAPI\item\Map;
 
 class EventListener implements Listener{
-	/** @var MapUtils */
-	private static $mapUtils;
+	/** @var Loader */
 	public $owner;
 
 	public function __construct(Plugin $plugin){
 		$this->owner = $plugin;
-		self::$mapUtils = new MapUtils();
 	}
 
 	//TODO listen for packet, probably load from nbt/make new map
@@ -38,28 +37,24 @@ class EventListener implements Listener{
 		switch ($packet instanceof MapInfoRequestPacket){
 			case ProtocolInfo::MAP_INFO_REQUEST_PACKET:
 				/** @var MapInfoRequestPacket $packet */
-				$path = Loader::$path['maps'] . '/map_' . $packet->uuid;
-				if (!is_null($map = self::getMapUtils()->getCachedMap($packet->uuid))){
+				$path = Loader::$path['maps'] . '/map_' . $packet->mapId;
+				if (!is_null($map = $this->owner::getMapUtils()->getCachedMap($packet->mapId))){
 					$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-				} elseif ($packet->uuid == -1 || !file_exists($path)){
-					$map = new Map($packet->uuid);
+				} elseif ($packet->mapId == -1 || !file_exists($path)){
+					$map = new Map($packet->mapId);
 					$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
 				} else{
-					$map = self::getMapUtils()->loadFromNBT($packet->uuid);
+					$map = $this->owner::getMapUtils()->loadFromNBT($packet->mapId);
 					$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-					self::getMapUtils()->cacheMap($map);
+					$this->owner::getMapUtils()->cacheMap($map);
 				}
 				break;
 		}
 	}
 
 	public function onDisable(PluginDisableEvent $event){
-		foreach (self::getMapUtils()->getAllCachedMaps() as $cachedMap){
-			self::getMapUtils()->exportToNBT($cachedMap, $cachedMap->getMapId());
+		foreach ($this->owner::getMapUtils()->getAllCachedMaps() as $cachedMap){
+			$this->owner::getMapUtils()->exportToNBT($cachedMap, $cachedMap->getMapId());
 		}
-	}
-
-	public static function getMapUtils(){
-		return self::$mapUtils;
 	}
 }

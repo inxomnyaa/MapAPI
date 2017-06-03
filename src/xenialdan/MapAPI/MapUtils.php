@@ -36,8 +36,9 @@ use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use xenialdan\MapAPI\item\Map;
 
-class MapUtils{//actual name of the "tool"
+class MapUtils{
 
 	/** @var Color[] */
 	public static $BaseMapColors = [];
@@ -107,21 +108,6 @@ class MapUtils{//actual name of the "tool"
 		self::$idConfig->set("map", $id);
 		self::$idConfig->save();
 		return $id;
-	}
-
-	public function cacheMap(Map $map){//TODO: serialize?
-		self::$cachedMaps[$map->getMapId()] = $map;
-	}
-
-	public function getCachedMap(int $uuid){
-		return self::$cachedMaps[$uuid]??null;
-	}
-
-	/**
-	 * @return Map[]
-	 */
-	public function getAllCachedMaps(){
-		return self::$cachedMaps;
 	}
 
 	public static function distanceHSV(array $hsv1, array $hsv2){
@@ -484,6 +470,21 @@ class MapUtils{//actual name of the "tool"
 		}
 	}
 
+	public function cacheMap(Map $map){//TODO: serialize?
+		self::$cachedMaps[$map->getMapId()] = $map;
+	}
+
+	public function getCachedMap(int $mapId){
+		return self::$cachedMaps[$mapId]??null;
+	}
+
+	/**
+	 * @return Map[]
+	 */
+	public function getAllCachedMaps(){
+		return self::$cachedMaps;
+	}
+
 	/**
 	 * Returns the closest map color to a Color
 	 * This will ignore alpha
@@ -537,7 +538,11 @@ class MapUtils{//actual name of the "tool"
 		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId(), $nbt->writeCompressed());
 		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId());
 	}
-	
+
+	public function getMapColors(){//TODO: make static
+		return self::$MapColors;
+	}
+
 	public function loadFromNBT($id){
 		$path = Loader::$path['maps'] . '/map_' . $id;
 		if (!file_exists($path)) return false;
@@ -561,9 +566,5 @@ class MapUtils{//actual name of the "tool"
 		$map->setColors($colors);
 		//deco
 		return $map;
-}
-
-	public function getMapColors(){//TODO: make static
-		return self::$MapColors;
 	}
 }

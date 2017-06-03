@@ -10,7 +10,8 @@ use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use xenialdan\MapAPI\Color;
-use xenialdan\MapAPI\Map;
+use xenialdan\MapAPI\item\Map;
+use xenialdan\MapAPI\Loader;
 use xenialdan\MapAPI\MapUtils;
 
 class CreateSubCommand extends SubCommand{
@@ -46,10 +47,9 @@ class CreateSubCommand extends SubCommand{
 			$player->sendMessage(TextFormat::RED . 'Sorry, you need to provide a png filename for the map');
 			return false;
 		}
-		$png = $args[0];
-		$mapUtils = new MapUtils();
+		$png = str_replace("png", "", $args[0]);
 		$colors = [];
-		$image = @imagecreatefrompng($this->getPlugin()->getDataFolder() . 'png_maps/' . $args[0] . '.png');
+		$image = @imagecreatefrompng($this->getPlugin()->getDataFolder() . 'images/' . $args[0] . '.png');
 		if ($image !== false){
 			$ratio = imagesx($image) / imagesy($image);
 			if ($ratio > 1){
@@ -60,11 +60,11 @@ class CreateSubCommand extends SubCommand{
 				$height = 128;
 			}
 			$image = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
-			imagepng($image, $this->getPlugin()->getDataFolder() . 'png_maps/' . $args[0] . '.new.png');
+			imagepng($image, $this->getPlugin()->getDataFolder() . 'maps_exported/' . $args[0] . '.png');
 			for ($y = 0; $y < $height; ++$y){
 				for ($x = 0; $x < $width; ++$x){
 					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-					$colors[$y][$x] = $mapUtils->getClosestMapColor(new Color($color['red'], $color['green'], $color['blue'], $color['alpha']));
+					$colors[$y][$x] = Loader::getMapUtils()->getClosestMapColor(new Color($color['red'], $color['green'], $color['blue'], $color['alpha']));
 				}
 			}
 			$map = new Map($id = MapUtils::getNewId(), $colors, 1, $width, $height);
@@ -74,7 +74,7 @@ class CreateSubCommand extends SubCommand{
 			$item->setCompoundTag($tag);
 			$player->getInventory()->addItem($item);
 			$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-			MapUtils::cacheMap($map);
+			Loader::getMapUtils()->cacheMap($map);
 		} else{
 			$player->sendMessage(TextFormat::RED . 'Wasn\'t able to create or access the png file! Make sure your path is correct!');
 			return false;
