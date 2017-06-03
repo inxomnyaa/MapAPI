@@ -142,6 +142,6 @@ class Map {
 	}
 
 	public function save() {
-		//TODO. -> see maputils export
+		//TODO. -> see maputils too
 	}
 }

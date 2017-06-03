@@ -109,12 +109,19 @@ class MapUtils{//actual name of the "tool"
 		return $id;
 	}
 
-	public static function cacheMap(Map $map){//TODO: serialize?
+	public function cacheMap(Map $map){//TODO: serialize?
 		self::$cachedMaps[$map->getMapId()] = $map;
 	}
 
-	public static function getCachedMap(int $uuid){
-		return self::$cachedMaps[$uuid]??-1;
+	public function getCachedMap(int $uuid){
+		return self::$cachedMaps[$uuid]??null;
+	}
+
+	/**
+	 * @return Map[]
+	 */
+	public function getAllCachedMaps(){
+		return self::$cachedMaps;
 	}
 
 	public static function distanceHSV(array $hsv1, array $hsv2){
@@ -528,23 +535,32 @@ class MapUtils{//actual name of the "tool"
 		);
 		$nbt->setData($t);
 		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId(), $nbt->writeCompressed());
-		return touch(Loader::$path['maps'] . '/map_' . $map->getMapId());
+		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId());
 	}
 	
 	public function loadFromNBT($id){
 		$path = Loader::$path['maps'] . '/map_' . $id;
-		if (!touch($path)) return false;
+		if (!file_exists($path)) return false;
 		$map = new Map();
 		$nbt = new NBT(NBT::BIG_ENDIAN);
 		$nbt->readCompressed(file_get_contents($path));
-		$data = $nbt->getData();
+		$data = $nbt->getData()->data;
 		#Server::getInstance()->getLogger()->debug(var_export($data, true));
 		$map->setWidth($data->width->getValue());
 		$map->setHeight($data->height->getValue());
 		$map->setXOffset($data->xCenter->getValue());
 		$map->setYOffset($data->zCenter->getValue());
-		$map->setColors($data->colors->getValue());
+		/** @var Color[][] */
+		$colors = [];
+		$data = unpack('C*', $data->colors->getValue());
+		for ($y = 0; $y < $map->getHeight(); ++$y){
+			for ($x = 0; $x < $map->getWidth(); ++$x){
+				$colors[$y][$x] = $this->getMapColors()[$data[($y * $map->getWidth()) + $x]??0];
+			}
+		}
+		$map->setColors($colors);
 		//deco
+		return $map;
 }
 
 	public function getMapColors(){//TODO: make static
