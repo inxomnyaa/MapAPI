@@ -10,10 +10,6 @@ class Loader extends PluginBase{
 	/** @var MapUtils */
 	public static $mapUtils;
 
-	public static function getMapUtils(){
-		return self::$mapUtils;
-	}
-
 	public function onEnable(){
 		self::$path['maps'] = $this->getDataFolder() . 'maps';
 		self::$path['images'] = $this->getDataFolder() . 'images';
@@ -27,5 +23,15 @@ class Loader extends PluginBase{
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
 		self::$mapUtils = new MapUtils();
+	}
+
+	public function onDisable(){
+		foreach ($this::getMapUtils()->getAllCachedMaps() as $cachedMap){
+			$cachedMap->save();
+		}
+	}
+
+	public static function getMapUtils(){
+		return self::$mapUtils;
 	}
 }

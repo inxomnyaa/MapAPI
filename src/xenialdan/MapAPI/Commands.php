@@ -8,6 +8,7 @@ use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 use xenialdan\MapAPI\subcommand\CreateSubCommand;
+use xenialdan\MapAPI\subcommand\SaveSubCommand;
 use xenialdan\MapAPI\subcommand\SubCommand;
 
 class Commands extends PluginCommand{
@@ -21,6 +22,7 @@ class Commands extends PluginCommand{
 		$this->setPermission("map.command");
 		$this->setDescription("The main commands for MapAPI");
 		$this->loadSubCommand(new CreateSubCommand($plugin));
+		$this->loadSubCommand(new SaveSubCommand($plugin));
 	}
 
 	private function loadSubCommand(SubCommand $command){

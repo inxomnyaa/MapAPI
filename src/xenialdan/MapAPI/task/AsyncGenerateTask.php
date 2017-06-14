@@ -1,6 +1,6 @@
 <?php
 
-namespace xenialdan\ItemStacks\task;
+namespace xenialdan\MapAPI\task;
 
 use pocketmine\scheduler\PluginTask;
 use xenialdan\ItemStacks\Loader;

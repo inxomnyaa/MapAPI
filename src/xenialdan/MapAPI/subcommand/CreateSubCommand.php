@@ -47,9 +47,9 @@ class CreateSubCommand extends SubCommand{
 			$player->sendMessage(TextFormat::RED . 'Sorry, you need to provide a png filename for the map');
 			return false;
 		}
-		$png = str_replace("png", "", $args[0]);
+		$png = str_replace(".png", "", $args[0]);
 		$colors = [];
-		$image = @imagecreatefrompng($this->getPlugin()->getDataFolder() . 'images/' . $args[0] . '.png');
+		$image = @imagecreatefrompng($this->getPlugin()->getDataFolder() . 'images/' . $png . '.png');
 		if ($image !== false){
 			$ratio = imagesx($image) / imagesy($image);
 			if ($ratio > 1){

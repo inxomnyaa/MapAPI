@@ -5,6 +5,7 @@ namespace xenialdan\MapAPI\item;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
 use pocketmine\utils\Color;
+use xenialdan\MapAPI\Loader;
 
 class Map{
 
@@ -32,13 +33,97 @@ class Map{
 		$this->yOffset = $yOffset;
 	}
 
+	/**
+	 * @return int $id
+	 */
+	public function getMapId(){
+		return $this->id;
+	}
+
 	public function setMapId(int $id){
 		$this->id = $id;
 		//TODO: update?? i guess resend.. client would request?
 	}
 
+	public function getScale(){
+		return $this->scale;
+	}
+
 	public function setScale(int $scale){
 		$this->scale = $scale;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	public function getDecorations(){
+		return $this->decorations;
+	}
+
+	public function addDecoration($decorations){
+		$this->decorations[] = $decorations;
+		end($this->decorations);
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
+		return key($this->decorations);
+	}
+
+	public function removeDecoration(int $id){
+		unset($this->decorations[$id]);
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
+	}
+
+	public function getWidth(){
+		return $this->width;
+	}
+
+	public function setWidth(int $width){
+		$this->width = $width;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	public function getHeight(){
+		return $this->height;
+	}
+
+	public function setHeight(int $height){
+		$this->height = $height;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	public function getXOffset(){
+		return $this->xOffset;
+	}
+
+	public function setXOffset(int $xOffset){
+		$this->xOffset = $xOffset;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	public function getYOffset(){
+		return $this->yOffset;
+	}
+
+	public function setYOffset(int $yOffset){
+		$this->yOffset = $yOffset;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	/**
+	 * @return Color[][]
+	 */
+	public function getColors(){
+		return $this->colors;
+	}
+
+	public function getColorAt(int $x, int $y){
+		return $this->colors[$y][$x];
+	}
+
+	public function setColors(array $colors){
+		$this->colors = $colors;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+	}
+
+	public function setColorAt(Color $color, int $x, int $y){
+		$this->colors[$y][$x] = $color;
 		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
 	}
 
@@ -57,91 +142,7 @@ class Map{
 		Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $pk);
 	}
 
-	/**
-	 * @return int $id
-	 */
-	public function getMapId(){
-		return $this->id;
-	}
-
-	public function getScale(){
-		return $this->scale;
-	}
-
-	public function getDecorations(){
-		return $this->decorations;
-	}
-
-	public function getWidth(){
-		return $this->width;
-	}
-
-	public function getHeight(){
-		return $this->height;
-	}
-
-	public function getXOffset(){
-		return $this->xOffset;
-	}
-
-	public function getYOffset(){
-		return $this->yOffset;
-	}
-
-	/**
-	 * @return Color[][]
-	 */
-	public function getColors(){
-		return $this->colors;
-	}
-
-	public function addDecoration($decorations){
-		$this->decorations[] = $decorations;
-		end($this->decorations);
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
-		return key($this->decorations);
-	}
-
-	public function removeDecoration(int $id){
-		unset($this->decorations[$id]);
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
-	}
-
-	public function setWidth(int $width){
-		$this->width = $width;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
-	public function setHeight(int $height){
-		$this->height = $height;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
-	public function setXOffset(int $xOffset){
-		$this->xOffset = $xOffset;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
-	public function setYOffset(int $yOffset){
-		$this->yOffset = $yOffset;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
-	public function getColorAt(int $x, int $y){
-		return $this->colors[$y][$x];
-	}
-
-	public function setColors(array $colors){
-		$this->colors = $colors;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
-	public function setColorAt(Color $color, int $x, int $y){
-		$this->colors[$y][$x] = $color;
-		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-	}
-
 	public function save(){
-		//TODO. -> see maputils too
+		return Loader::getMapUtils()->exportToNBT($this, $this->getMapId());
 	}
 }

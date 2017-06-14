@@ -51,10 +51,4 @@ class EventListener implements Listener{
 				break;
 		}
 	}
-
-	public function onDisable(PluginDisableEvent $event){
-		foreach ($this->owner::getMapUtils()->getAllCachedMaps() as $cachedMap){
-			$this->owner::getMapUtils()->exportToNBT($cachedMap, $cachedMap->getMapId());
-		}
-	}
 }

@@ -522,20 +522,25 @@ class MapUtils{
 			}
 		}
 		$nbt = new NBT(NBT::BIG_ENDIAN);
-		$t = new CompoundTag($name,
-			new CompoundTag("data", new ShortTag("width", $map->getWidth()),
+		print __LINE__;
+		$t = /*new CompoundTag($name,*/
+			new CompoundTag($name,
+				new ShortTag("width", $map->getWidth()),
 				new ShortTag("height", $map->getHeight()),
 				new ByteTag("scale", $map->getScale()),
 				new ByteTag("fullyExplored", 1),//to have transparency instead of the map background
 				new ByteTag("dimension", 0),//maybe todo
-				new IntTag("xCenter", 0),//maybe todo
-				new IntTag("zCenter", 0),//maybe todo
-				new ByteArrayTag("colors", $data),
-				new ListTag("decorations", [])
-			)
+				new IntTag("xCenter", $map->getXOffset()),//maybe todo
+				new IntTag("zCenter", $map->getYOffset())//maybe todo
+				#new ByteArrayTag("colors", $data),
+				#new ListTag("decorations", [])
+			//)
 		);
+		print __LINE__;
 		$nbt->setData($t);
+		print __LINE__;
 		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId(), $nbt->writeCompressed());
+		print __LINE__;
 		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId());
 	}
 
