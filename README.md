@@ -11,3 +11,4 @@ You are set!
 - [ ] Different sizes/resolutions
 - [ ] Video rendering
 - [ ] Web image rendering
+- [ ] Turn into virion poggit library
