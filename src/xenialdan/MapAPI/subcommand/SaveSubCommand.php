@@ -3,16 +3,10 @@
 namespace xenialdan\MapAPI\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
-use xenialdan\MapAPI\Color;
-use xenialdan\MapAPI\item\Map;
 use xenialdan\MapAPI\Loader;
-use xenialdan\MapAPI\MapUtils;
+
 
 class SaveSubCommand extends SubCommand{
 
@@ -20,7 +14,7 @@ class SaveSubCommand extends SubCommand{
 		return ($sender instanceof Player) and $sender->hasPermission("map.command.save");
 	}
 
-	public function getUsage(){
+	public function getUsage(): string{
 		return "save";
 	}
 

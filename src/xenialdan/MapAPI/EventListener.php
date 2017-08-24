@@ -3,7 +3,6 @@
 namespace xenialdan\MapAPI;
 
 use pocketmine\event\Listener;
-use pocketmine\event\plugin\PluginDisableEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;

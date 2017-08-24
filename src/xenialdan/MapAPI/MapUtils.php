@@ -24,15 +24,12 @@ namespace xenialdan\MapAPI;
 use pocketmine\block\Block;
 use pocketmine\block\Planks;
 use pocketmine\block\Prismarine;
-use pocketmine\block\Slab;
-use pocketmine\block\Slab2;
 use pocketmine\block\Stone;
+use pocketmine\block\StoneSlab;
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Server;
 use pocketmine\utils\Config;
@@ -149,18 +146,18 @@ class MapUtils{
 			case Block::SAND:
 			case Block::SANDSTONE:
 			case Block::SANDSTONE_STAIRS:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::SANDSTONE:
-			case Block::DOUBLE_SLAB && $meta == Slab::SANDSTONE:
-			case Block::GLOWSTONE_BLOCK:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::SANDSTONE:
+			case Block::DOUBLE_STONE_SLAB && $meta == StoneSlab::SANDSTONE:
+			case Block::GLOWSTONE:
 			case Block::END_STONE:
 			case Block::PLANKS && $meta == Planks::BIRCH:
 			case Block::LOG && $meta == Planks::BIRCH:
 			case Block::BIRCH_FENCE_GATE:
 			case Block::FENCE && $meta = Planks::BIRCH:
-			case Block::BIRCH_WOODEN_STAIRS:
+			case Block::BIRCH_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::BIRCH:
 				#case Block::BROWN_MUSHROOM_BLOCK://todo: meta check for non stem inside textures
-				#case Block::BONE_BLOCK:
+			case Block::BONE_BLOCK:
 			case Block::END_BRICKS:
 				return new Color(247, 233, 163);
 				break;
@@ -178,7 +175,7 @@ class MapUtils{
 				break;
 			case Block::ICE:
 			case Block::PACKED_ICE:
-				#case Block::FROSTED_ICE:
+			case Block::FROSTED_ICE:
 				return new Color(160, 160, 255);
 				break;
 			case Block::IRON_BLOCK:
@@ -187,7 +184,7 @@ class MapUtils{
 			case Block::IRON_BARS:
 			case Block::BREWING_STAND_BLOCK:
 			case Block::ANVIL:
-			case Block::WEIGHTED_PRESSURE_PLATE_HEAVY:
+			case Block::HEAVY_WEIGHTED_PRESSURE_PLATE:
 				return new Color(167, 167, 167);
 				break;
 			case Block::SAPLING:
@@ -219,7 +216,7 @@ class MapUtils{
 				return new Color(255, 255, 255);
 				break;
 			case Block::CLAY_BLOCK:
-			case Block::MONSTER_EGG_BLOCK:
+			case Block::MONSTER_EGG:
 				return new Color(164, 168, 184);
 				break;
 			case Block::DIRT:
@@ -229,22 +226,22 @@ class MapUtils{
 			case Block::SAND && $meta == 1:
 			case Block::RED_SANDSTONE:
 			case Block::RED_SANDSTONE_STAIRS:
-			case Block::SLAB2 && ($meta & 0x07) == Slab2::RED_SANDSTONE:
+			case Block::STONE_SLAB2 && ($meta & 0x07) == StoneSlab::RED_SANDSTONE://slab2
 			case Block::LOG && $meta == Planks::JUNGLE:
-			case Block::PLANK && $meta == Planks::JUNGLE:
+			case Block::PLANKS && $meta == Planks::JUNGLE:
 			case Block::JUNGLE_FENCE_GATE:
 			case Block::FENCE && $meta == Planks::JUNGLE:
-			case Block::JUNGLE_WOOD_STAIRS:
+			case Block::JUNGLE_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::JUNGLE:
 				return new Color(151, 109, 77);
 				break;
 			case Block::STONE:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::STONE:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::STONE:
 			case Block::COBBLESTONE:
-			case Block::COBBLE_STAIRS:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::COBBLESTONE:
+			case Block::COBBLESTONE_STAIRS:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::COBBLESTONE:
 			case Block::COBBLESTONE_WALL:
-			case Block::MOSSY_STONE:
+			case Block::MOSS_STONE:
 			case Block::STONE && $meta == Stone::ANDESITE:
 			case Block::STONE && $meta == Stone::POLISHED_ANDESITE:
 			case Block::BEDROCK:
@@ -256,8 +253,8 @@ class MapUtils{
 			case Block::DROPPER:
 			case Block::STICKY_PISTON:
 			case Block::PISTON:
-			case Block::PISTON_HEAD:
-			case Block::BLOCK_MOVED_BY_PISTON:
+			case Block::PISTON_ARM_COLLISION:
+			case Block::MOVINGBLOCK:
 			case Block::MONSTER_SPAWNER:
 			case Block::DIAMOND_ORE:
 			case Block::FURNACE:
@@ -265,7 +262,7 @@ class MapUtils{
 			case Block::REDSTONE_ORE:
 			case Block::STONE_BRICK:
 			case Block::STONE_BRICK_STAIRS:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::STONE_BRICK:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::STONE_BRICK:
 			case Block::ENDER_CHEST:
 			case Block::HOPPER_BLOCK:
 			case Block::GRAVEL:
@@ -277,10 +274,10 @@ class MapUtils{
 				return new Color(64, 64, 255);
 				break;
 			case Block::WOOD && $meta == Planks::OAK:
-			case Block::PLANK && $meta == Planks::OAK:
+			case Block::PLANKS && $meta == Planks::OAK:
 			case Block::FENCE && $meta == Planks::OAK:
 			case Block::OAK_FENCE_GATE:
-			case Block::OAK_WOOD_STAIRS:
+			case Block::OAK_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::OAK:
 			case Block::NOTEBLOCK:
 			case Block::BOOKSHELF:
@@ -296,16 +293,17 @@ class MapUtils{
 			case Block::SIGN_POST:
 			case Block::WALL_SIGN:
 			case Block::WOODEN_PRESSURE_PLATE:
-				#case Block::JUKEBOX:
+			case Block::JUKEBOX:
 			case Block::WOODEN_TRAPDOOR:
 			case Block::BROWN_MUSHROOM_BLOCK:
-				#case Block::BANNER:
+			case Block::STANDING_BANNER:
+			case Block::WALL_BANNER:
 			case Block::DAYLIGHT_SENSOR:
 			case Block::DAYLIGHT_SENSOR_INVERTED:
 				return new Color(143, 119, 72);
 				break;
 			case Block::QUARTZ_BLOCK:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::QUARTZ:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::QUARTZ:
 			case Block::QUARTZ_STAIRS:
 			case Block::STONE && $meta == Stone::DIORITE:
 			case Block::STONE && $meta == Stone::POLISHED_DIORITE:
@@ -319,19 +317,19 @@ class MapUtils{
 			case Block::JACK_O_LANTERN:
 			case Block::HARDENED_CLAY:
 			case Block::WOOD && $meta == Planks::ACACIA:
-			case Block::PLANK && $meta == Planks::ACACIA:
+			case Block::PLANKS && $meta == Planks::ACACIA:
 			case Block::FENCE && $meta == Planks::ACACIA:
 			case Block::ACACIA_FENCE_GATE:
-			case Block::ACACIA_WOOD_STAIRS:
+			case Block::ACACIA_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::ACACIA:
 				return new Color(216, 127, 51);
 				break;
 			case Block::WOOL && $meta == Color::COLOR_DYE_MAGENTA:
 			case Block::CARPET && $meta == Color::COLOR_DYE_MAGENTA:
 			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_MAGENTA:
-			case Block::PURPUR:
+			case Block::PURPUR_BLOCK:
 			case Block::PURPUR_STAIRS:
-			case Block::SLAB2 && ($meta & 0x07) == Slab2::PURPUR:
+			case Block::STONE_SLAB2 && ($meta & 0x07) == Stone::PURPUR_BLOCK://slab2
 				return new Color(178, 76, 216);
 				break;
 			case Block::WOOL && $meta == Color::COLOR_DYE_LIGHT_BLUE:
@@ -366,7 +364,7 @@ class MapUtils{
 			case Block::WOOL && $meta == Color::COLOR_DYE_LIGHT_GRAY:
 			case Block::CARPET && $meta == Color::COLOR_DYE_LIGHT_GRAY:
 			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_LIGHT_GRAY:
-				#case Block::STRUCTURE_BLOCK:
+			case Block::STRUCTURE_BLOCK:
 				return new Color(153, 153, 153);
 				break;
 			case Block::WOOL && $meta == Color::COLOR_DYE_CYAN:
@@ -394,10 +392,10 @@ class MapUtils{
 			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_BROWN:
 			case Block::SOUL_SAND:
 			case Block::WOOD && $meta == Planks::DARK_OAK:
-			case Block::PLANK && $meta == Planks::DARK_OAK:
+			case Block::PLANKS && $meta == Planks::DARK_OAK:
 			case Block::FENCE && $meta == Planks::DARK_OAK:
 			case Block::DARK_OAK_FENCE_GATE:
-			case Block::DARK_OAK_WOOD_STAIRS:
+			case Block::DARK_OAK_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::DARK_OAK:
 				#case Block::COMMAND_BLOCK://meta = impulse
 				return new Color(102, 76, 51);
@@ -413,12 +411,12 @@ class MapUtils{
 			case Block::CARPET && $meta == Color::COLOR_DYE_RED:
 			case Block::STAINED_HARDENED_CLAY && $meta == Color::COLOR_DYE_RED:
 			case Block::RED_MUSHROOM_BLOCK://todo: meta
-			case Block::BRICKS:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::BRICK:
+			case Block::BRICK_BLOCK:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::BRICK:
 			case Block::BRICK_STAIRS:
 			case Block::ENCHANTING_TABLE:
 			case Block::NETHER_WART_BLOCK:
-				#case Block::NETHER_WART_BLOCK://For the future: a block with this name will be introduced soon!
+			case Block::NETHER_WART_PLANT:
 				return new Color(153, 51, 51);
 				break;
 			case Block::WOOL && $meta == Color::COLOR_DYE_BLACK:
@@ -427,7 +425,7 @@ class MapUtils{
 			case Block::DRAGON_EGG:
 			case Block::COAL_BLOCK:
 			case Block::OBSIDIAN:
-			case Block::END_PORTAL_BLOCK:
+			case Block::END_PORTAL:
 				return new Color(25, 25, 25);
 				break;
 			case Block::GOLD_BLOCK:
@@ -448,10 +446,10 @@ class MapUtils{
 				break;
 			case Block::PODZOL:
 			case Block::WOOD && $meta == Planks::SPRUCE:
-			case Block::PLANK && $meta == Planks::SPRUCE:
+			case Block::PLANKS && $meta == Planks::SPRUCE:
 			case Block::FENCE && $meta == Planks::SPRUCE:
 			case Block::SPRUCE_FENCE_GATE:
-			case Block::SPRUCE_WOOD_STAIRS:
+			case Block::SPRUCE_STAIRS:
 			case Block::WOODEN_SLAB && ($meta & 0x07) == Planks::SPRUCE:
 				return new Color(129, 86, 49);
 				break;
@@ -459,10 +457,9 @@ class MapUtils{
 			case Block::NETHER_QUARTZ_ORE:
 			case Block::NETHER_BRICK_FENCE:
 			case Block::NETHER_BRICK_BLOCK:
-				#case Block::RED_NETHER_BRICK_BLOCK:
-				#case Block::MAGMA:
+			case Block::MAGMA:
 			case Block::NETHER_BRICK_STAIRS:
-			case Block::STONE_SLAB && ($meta & 0x07) == Slab::NETHER_BRICK:
+			case Block::STONE_SLAB && ($meta & 0x07) == StoneSlab::NETHER_BRICK:
 				return new Color(112, 2, 0);
 				break;
 			default:
@@ -532,10 +529,10 @@ class MapUtils{
 				new ByteTag("dimension", 0),//maybe todo
 				new IntTag("xCenter", $map->getXOffset()),//maybe todo
 				new IntTag("zCenter", $map->getYOffset())//maybe todo
-				#new ByteArrayTag("colors", $data),
-				#new ListTag("decorations", [])
+			#new ByteArrayTag("colors", $data),
+			#new ListTag("decorations", [])
 			//)
-		);
+			);
 		print __LINE__;
 		$nbt->setData($t);
 		print __LINE__;

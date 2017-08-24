@@ -34,7 +34,7 @@ class Commands extends PluginCommand{
 		}
 	}
 
-	public function execute(CommandSender $sender, $alias, array $args){
+	public function execute(CommandSender $sender, string $commandLabel, array $args){
 		if (!isset($args[0])){
 			return $this->sendHelp($sender);
 		}

@@ -20,7 +20,7 @@ class CreateSubCommand extends SubCommand{
 		return ($sender instanceof Player) and $sender->hasPermission("map.command.create");
 	}
 
-	public function getUsage(){
+	public function getUsage(): string{
 		return "create <png_filename>";
 	}
 
@@ -60,14 +60,18 @@ class CreateSubCommand extends SubCommand{
 				$height = 128;
 			}
 			$image = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
+			$width = imagesx($image);
+			$height = imagesy($image);
 			imagepng($image, $this->getPlugin()->getDataFolder() . 'maps_exported/' . $args[0] . '.png');
 			for ($y = 0; $y < $height; ++$y){
 				for ($x = 0; $x < $width; ++$x){
 					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-					$colors[$y][$x] = Loader::getMapUtils()->getClosestMapColor(new Color($color['red'], $color['green'], $color['blue'], $color['alpha']));
+					$colors[$y][$x] = /*Loader::getMapUtils()->getClosestMapColor(*/
+						new Color($color['red'], $color['green'], $color['blue']/*, $color['alpha']*/)/*)*/
+					;
 				}
 			}
-			$map = new Map($id = MapUtils::getNewId(), $colors, 1, $width, $height);
+			$map = new Map($id = MapUtils::getNewId(), $colors, 2, $height, $width);
 			$item = Item::get(Item::FILLED_MAP, 0, 1);
 			$tag = new CompoundTag("", []);
 			$tag->map_uuid = new StringTag("map_uuid", strval($id));

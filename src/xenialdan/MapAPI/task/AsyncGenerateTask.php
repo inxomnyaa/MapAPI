@@ -14,7 +14,7 @@ class AsyncGenerateTask extends PluginTask{
 		$this->plugin = $owner;
 	}
 
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 	}
 
 	public function cancel(){
