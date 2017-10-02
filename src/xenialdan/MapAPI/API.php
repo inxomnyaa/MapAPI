@@ -27,15 +27,17 @@ use pocketmine\block\Prismarine;
 use pocketmine\block\Stone;
 use pocketmine\block\StoneSlab;
 use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use xenialdan\MapAPI\item\Map;
 
-class MapUtils{
+class API{
 
 	/** @var Color[] */
 	public static $BaseMapColors = [];
@@ -90,12 +92,13 @@ class MapUtils{
 			new Color(126, 84, 48)];
 
 		for ($i = 0; $i < count(self::$BaseMapColors); ++$i){
-			/** @var Color $bc */
-			$bc = self::$BaseMapColors[$i];
-			self::$MapColors[$i * 4 + 0] = new Color((int)($bc->getR() * 180.0 / 255.0 + 0.5), (int)($bc->getG() * 180.0 / 255.0 + 0.5), (int)($bc->getB() * 180.0 / 255.0 + 0.5), $bc->getA());
-			self::$MapColors[$i * 4 + 1] = new Color((int)($bc->getR() * 220.0 / 255.0 + 0.5), (int)($bc->getG() * 220.0 / 255.0 + 0.5), (int)($bc->getB() * 220.0 / 255.0 + 0.5), $bc->getA());
-			self::$MapColors[$i * 4 + 2] = $bc;
-			self::$MapColors[$i * 4 + 3] = new Color((int)($bc->getR() * 135.0 / 255.0 + 0.5), (int)($bc->getG() * 135.0 / 255.0 + 0.5), (int)($bc->getB() * 135.0 / 255.0 + 0.5), $bc->getA());
+			/* @var Color $bc /
+			 * $bc = self::$BaseMapColors[$i];
+			 * self::$MapColors[$i * 4 + 0] = new Color((int)($bc->getR() * 180.0 / 255.0 + 0.5), (int)($bc->getG() * 180.0 / 255.0 + 0.5), (int)($bc->getB() * 180.0 / 255.0 + 0.5), $bc->getA());
+			 * self::$MapColors[$i * 4 + 1] = new Color((int)($bc->getR() * 220.0 / 255.0 + 0.5), (int)($bc->getG() * 220.0 / 255.0 + 0.5), (int)($bc->getB() * 220.0 / 255.0 + 0.5), $bc->getA());
+			 * self::$MapColors[$i * 4 + 2] = $bc;
+			 * self::$MapColors[$i * 4 + 3] = new Color((int)($bc->getR() * 135.0 / 255.0 + 0.5), (int)($bc->getG() * 135.0 / 255.0 + 0.5), (int)($bc->getB() * 135.0 / 255.0 + 0.5), $bc->getA());
+			 */
 		}
 	}
 
@@ -520,7 +523,7 @@ class MapUtils{
 		}
 		$nbt = new NBT(NBT::BIG_ENDIAN);
 		print __LINE__;
-		$t = /*new CompoundTag($name,*/
+		$t =
 			new CompoundTag($name,
 				new ShortTag("width", $map->getWidth()),
 				new ShortTag("height", $map->getHeight()),
@@ -528,17 +531,16 @@ class MapUtils{
 				new ByteTag("fullyExplored", 1),//to have transparency instead of the map background
 				new ByteTag("dimension", 0),//maybe todo
 				new IntTag("xCenter", $map->getXOffset()),//maybe todo
-				new IntTag("zCenter", $map->getYOffset())//maybe todo
-			#new ByteArrayTag("colors", $data),
-			#new ListTag("decorations", [])
-			//)
+				new IntTag("zCenter", $map->getYOffset()),//maybe todo
+				new ByteArrayTag("colors", $data),
+				new ListTag("decorations", [])
 			);
 		print __LINE__;
 		$nbt->setData($t);
 		print __LINE__;
-		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId(), $nbt->writeCompressed());
+		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId() . '.dat', $nbt->writeCompressed());
 		print __LINE__;
-		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId());
+		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId() . '.dat');
 	}
 
 	public function getMapColors(){//TODO: make static
@@ -546,7 +548,7 @@ class MapUtils{
 	}
 
 	public function loadFromNBT($id){
-		$path = Loader::$path['maps'] . '/map_' . $id;
+		$path = Loader::$path['maps'] . '/map_' . $id . '.dat';
 		if (!file_exists($path)) return false;
 		$map = new Map();
 		$nbt = new NBT(NBT::BIG_ENDIAN);

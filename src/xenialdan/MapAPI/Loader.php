@@ -7,7 +7,7 @@ use pocketmine\plugin\PluginBase;
 class Loader extends PluginBase{
 
 	public static $path = [];
-	/** @var MapUtils */
+	/** @var API */
 	public static $mapUtils;
 
 	public function onEnable(){
@@ -22,7 +22,11 @@ class Loader extends PluginBase{
 		@mkdir(self::$path['maps_exported']);
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
-		self::$mapUtils = new MapUtils();
+		foreach (glob(self::$path['maps'].'map_*.dat') as $mapdata){
+			$map = $this::getMapUtils()->loadFromNBT($mapdata);
+			$this::getMapUtils()->cacheMap($map);
+		}
+		self::$mapUtils = new API();
 	}
 
 	public function onDisable(){

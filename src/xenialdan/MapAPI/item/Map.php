@@ -23,14 +23,14 @@ class Map{
 
 
 	public function __construct(int $id = -1, array $colors = [], int $scale = 1, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0){
-		$this->id = $id;
-		$this->colors = $colors;
-		$this->scale = $scale;
-		$this->width = $width;
-		$this->height = $height;
-		$this->decorations = $decorations;
-		$this->xOffset = $xOffset;
-		$this->yOffset = $yOffset;
+		$this->setMapId($id);
+		$this->setColors($colors);
+		$this->setScale($scale);
+		$this->setWidth($width);
+		$this->setHeight($height);
+		$this->setDecorations($decorations);
+		$this->setXOffset($xOffset);
+		$this->setYOffset($yOffset);
 	}
 
 	/**
@@ -58,8 +58,12 @@ class Map{
 		return $this->decorations;
 	}
 
-	public function addDecoration($decorations){
-		$this->decorations[] = $decorations;
+	public function setDecorations($decorations){
+		$this->decorations = $decorations;
+	}
+
+	public function addDecoration($decoration){
+		$this->decorations[] = $decoration;
 		end($this->decorations);
 		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
 		return key($this->decorations);
@@ -114,7 +118,11 @@ class Map{
 	}
 
 	public function getColorAt(int $x, int $y){
-		return $this->colors[$y][$x];
+		#if(isset($this->getColors()[$y]) && isset($this->getColors()[$y][$x]))
+		return $this->getColors()
+		[$y]
+		[$x];
+		#return Loader::getMapUtils()->getMapColors()[0];
 	}
 
 	public function setColors(array $colors){

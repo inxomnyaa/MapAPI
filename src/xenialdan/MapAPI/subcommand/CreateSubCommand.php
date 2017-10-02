@@ -12,7 +12,7 @@ use pocketmine\utils\TextFormat;
 use xenialdan\MapAPI\Color;
 use xenialdan\MapAPI\item\Map;
 use xenialdan\MapAPI\Loader;
-use xenialdan\MapAPI\MapUtils;
+use xenialdan\MapAPI\API;
 
 class CreateSubCommand extends SubCommand{
 
@@ -71,7 +71,7 @@ class CreateSubCommand extends SubCommand{
 					;
 				}
 			}
-			$map = new Map($id = MapUtils::getNewId(), $colors, 2, $height, $width);
+			$map = new Map($id = API::getNewId(), $colors, 2, $height, $width);
 			$item = Item::get(Item::FILLED_MAP, 0, 1);
 			$tag = new CompoundTag("", []);
 			$tag->map_uuid = new StringTag("map_uuid", strval($id));

@@ -2,6 +2,7 @@
 
 namespace xenialdan\MapAPI;
 
+use pocketmine\event\level\LevelSaveEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\level\Level;
@@ -22,19 +23,21 @@ class EventListener implements Listener{
 		$this->owner = $plugin;
 	}
 
+	public function onSaveEvent(LevelSaveEvent $event){
+		foreach ($this->owner::getMapUtils()->getAllCachedMaps() as $cachedMap){
+			$cachedMap->save();
+		}
+	}
+
 	//TODO listen for packet, probably load from nbt/make new map
 	public function onPacketReceive(DataPacketReceiveEvent $event){
 		/** @var DataPacket $packet */
-		if (!($packet = $event->getPacket()) instanceof MapInfoRequestPacket) return;
+		if (!($packet = $event->getPacket()) instanceof MapInfoRequestPacket&&!$packet instanceof ClientboundMapItemDataPacket) return;
 		/** @var Player $player */
 		if (!($player = $event->getPlayer()) instanceof Player) return;
-		/** @var Level $level */
-		if (($level = $player->getLevel())->getId() !== Server::getInstance()->getDefaultLevel()->getId()){
-			return;
-		}
 		/** @var MapInfoRequestPacket $packet */
-		switch ($packet instanceof MapInfoRequestPacket){
-			case ProtocolInfo::MAP_INFO_REQUEST_PACKET:
+		switch ($packet::NETWORK_ID){
+			case MapInfoRequestPacket::NETWORK_ID:
 				/** @var MapInfoRequestPacket $packet */
 				$path = Loader::$path['maps'] . '/map_' . $packet->mapId;
 				if (!is_null($map = $this->owner::getMapUtils()->getCachedMap($packet->mapId))){
@@ -42,12 +45,18 @@ class EventListener implements Listener{
 				} elseif ($packet->mapId == -1 || !file_exists($path)){
 					$map = new Map($packet->mapId);
 					$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+					$this->owner::getMapUtils()->cacheMap($map);
 				} else{
 					$map = $this->owner::getMapUtils()->loadFromNBT($packet->mapId);
 					$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
 					$this->owner::getMapUtils()->cacheMap($map);
 				}
+				$event->setCancelled();
 				break;
+			case ClientboundMapItemDataPacket::NETWORK_ID:{
+				$event->setCancelled();
+				break;
+			}
 		}
 	}
 }
