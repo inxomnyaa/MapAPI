@@ -96,4 +96,8 @@ class Color extends \pocketmine\utils\Color{
 
 		return $hsv;
 	}
+
+	public function toArray(){
+		return [$this->getR(), $this->getG(), $this->getB(), $this->getA()];
+	}
 }

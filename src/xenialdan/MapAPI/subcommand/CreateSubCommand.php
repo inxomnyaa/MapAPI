@@ -9,10 +9,10 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
+use xenialdan\MapAPI\API;
 use xenialdan\MapAPI\Color;
 use xenialdan\MapAPI\item\Map;
 use xenialdan\MapAPI\Loader;
-use xenialdan\MapAPI\API;
 
 class CreateSubCommand extends SubCommand{
 
@@ -62,7 +62,7 @@ class CreateSubCommand extends SubCommand{
 			$image = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
 			$width = imagesx($image);
 			$height = imagesy($image);
-			imagepng($image, $this->getPlugin()->getDataFolder() . 'maps_exported/' . $args[0] . '.png');
+			#imagepng($image, $this->getPlugin()->getDataFolder() . 'maps_exported/' . $args[0] . '.png');
 			for ($y = 0; $y < $height; ++$y){
 				for ($x = 0; $x < $width; ++$x){
 					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
@@ -72,11 +72,10 @@ class CreateSubCommand extends SubCommand{
 				}
 			}
 			$map = new Map($id = API::getNewId(), $colors, 2, $height, $width);
-			$item = Item::get(Item::FILLED_MAP, 0, 1);
 			$tag = new CompoundTag("", []);
 			$tag->map_uuid = new StringTag("map_uuid", strval($id));
-			$item->setCompoundTag($tag);
-			$player->getInventory()->addItem($item);
+			$map->setCompoundTag($tag);
+			$player->getInventory()->addItem($map);
 			$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
 			Loader::getMapUtils()->cacheMap($map);
 		} else{

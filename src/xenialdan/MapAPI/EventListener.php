@@ -5,14 +5,11 @@ namespace xenialdan\MapAPI;
 use pocketmine\event\level\LevelSaveEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\level\Level;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
 use pocketmine\network\mcpe\protocol\MapInfoRequestPacket;
-use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
-use pocketmine\Server;
 use xenialdan\MapAPI\item\Map;
 
 class EventListener implements Listener{
@@ -26,13 +23,15 @@ class EventListener implements Listener{
 	public function onSaveEvent(LevelSaveEvent $event){
 		foreach ($this->owner::getMapUtils()->getAllCachedMaps() as $cachedMap){
 			$cachedMap->save();
+			API::exportToPNG($cachedMap);
+			#API::exportToPNG($cachedMap);
 		}
 	}
 
 	//TODO listen for packet, probably load from nbt/make new map
 	public function onPacketReceive(DataPacketReceiveEvent $event){
 		/** @var DataPacket $packet */
-		if (!($packet = $event->getPacket()) instanceof MapInfoRequestPacket&&!$packet instanceof ClientboundMapItemDataPacket) return;
+		if (!($packet = $event->getPacket()) instanceof MapInfoRequestPacket && !$packet instanceof ClientboundMapItemDataPacket) return;
 		/** @var Player $player */
 		if (!($player = $event->getPlayer()) instanceof Player) return;
 		/** @var MapInfoRequestPacket $packet */
@@ -53,7 +52,7 @@ class EventListener implements Listener{
 				}
 				$event->setCancelled();
 				break;
-			case ClientboundMapItemDataPacket::NETWORK_ID:{
+			case ClientboundMapItemDataPacket::NETWORK_ID: {
 				$event->setCancelled();
 				break;
 			}

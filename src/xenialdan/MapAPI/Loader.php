@@ -2,7 +2,9 @@
 
 namespace xenialdan\MapAPI;
 
+use pocketmine\item\ItemFactory;
 use pocketmine\plugin\PluginBase;
+use xenialdan\MapAPI\item\Map;
 
 class Loader extends PluginBase{
 
@@ -18,15 +20,17 @@ class Loader extends PluginBase{
 		@mkdir(self::$path['maps']);
 		//png images
 		@mkdir(self::$path['images']);
-		//rescaled png images, just because i can :D
+		//map data to img
 		@mkdir(self::$path['maps_exported']);
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 		$this->getServer()->getCommandMap()->register(Commands::class, new Commands($this));
-		foreach (glob(self::$path['maps'].'map_*.dat') as $mapdata){
+		self::$mapUtils = new API();
+		ItemFactory::registerItem(new Map(), true);
+		foreach (glob(self::$path['maps'] . '/*.dat') as $mapdata){
 			$map = $this::getMapUtils()->loadFromNBT($mapdata);
+			var_dump($map->getMapId());
 			$this::getMapUtils()->cacheMap($map);
 		}
-		self::$mapUtils = new API();
 	}
 
 	public function onDisable(){
@@ -35,6 +39,9 @@ class Loader extends PluginBase{
 		}
 	}
 
+	/**
+	 * @return API
+	 */
 	public static function getMapUtils(){
 		return self::$mapUtils;
 	}

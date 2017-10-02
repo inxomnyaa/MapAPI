@@ -27,9 +27,9 @@ use pocketmine\block\Prismarine;
 use pocketmine\block\Stone;
 use pocketmine\block\StoneSlab;
 use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ByteArrayTag;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
@@ -41,7 +41,6 @@ class API{
 
 	/** @var Color[] */
 	public static $BaseMapColors = [];
-	public static $MapColors = [];
 	public static $idConfig;
 	private static $cachedMaps = [];
 
@@ -91,15 +90,10 @@ class API{
 			//new 1.8 colors
 			new Color(126, 84, 48)];
 
-		for ($i = 0; $i < count(self::$BaseMapColors); ++$i){
-			/* @var Color $bc /
-			 * $bc = self::$BaseMapColors[$i];
-			 * self::$MapColors[$i * 4 + 0] = new Color((int)($bc->getR() * 180.0 / 255.0 + 0.5), (int)($bc->getG() * 180.0 / 255.0 + 0.5), (int)($bc->getB() * 180.0 / 255.0 + 0.5), $bc->getA());
-			 * self::$MapColors[$i * 4 + 1] = new Color((int)($bc->getR() * 220.0 / 255.0 + 0.5), (int)($bc->getG() * 220.0 / 255.0 + 0.5), (int)($bc->getB() * 220.0 / 255.0 + 0.5), $bc->getA());
-			 * self::$MapColors[$i * 4 + 2] = $bc;
-			 * self::$MapColors[$i * 4 + 3] = new Color((int)($bc->getR() * 135.0 / 255.0 + 0.5), (int)($bc->getG() * 135.0 / 255.0 + 0.5), (int)($bc->getB() * 135.0 / 255.0 + 0.5), $bc->getA());
-			 */
-		}
+		//shade 1 new Color((int)($bc->getR() * 180.0 / 255.0 + 0.5), (int)($bc->getG() * 180.0 / 255.0 + 0.5), (int)($bc->getB() * 180.0 / 255.0 + 0.5), $bc->getA());
+		//shade 2 new Color((int)($bc->getR() * 220.0 / 255.0 + 0.5), (int)($bc->getG() * 220.0 / 255.0 + 0.5), (int)($bc->getB() * 220.0 / 255.0 + 0.5), $bc->getA());
+		//shade 3 self::$MapColors[$i * 4 + 2] = $bc;
+		//shade 4 new Color((int)($bc->getR() * 135.0 / 255.0 + 0.5), (int)($bc->getG() * 135.0 / 255.0 + 0.5), (int)($bc->getB() * 135.0 / 255.0 + 0.5), $bc->getA());
 	}
 
 	public static function getNewId(){
@@ -114,29 +108,6 @@ class API{
 		return ($hsv1['v'] - $hsv2['v']) ** 2
 			+ ($hsv1['s'] * cos($hsv1['h']) - $hsv2['s'] * cos($hsv2['h'])) ** 2
 			+ ($hsv1['s'] * sin($hsv1['h']) - $hsv2['s'] * sin($hsv2['h'])) ** 2;
-	}
-
-	public static function exportToPNG(Map $map){
-		if (!extension_loaded("gd")){
-			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
-			var_dump(get_loaded_extensions());
-			return false;
-		}
-		@mkdir(Server::getInstance()->getDataPath() . "maps_exported");
-		$filename = Server::getInstance()->getDataPath() . "maps_exported/map_" . $map->getMapId() . ".png";
-		$colors = $map->getColors();
-		$width = $map->getWidth();
-		$height = $map->getHeight();
-		$img = imagecreatetruecolor($width, $height);
-		#imagecolortransparent($img, imagecolorallocate($img, 0, 0, 0));
-		for ($y = 0; $y < $height; ++$y){
-			for ($x = 0; $x < $width; ++$x){
-				/** @var Color $color */
-				$color = $colors[$y][$x];
-				imagesetpixel($img, $x, $y, imagecolorallocate($img, $color->getR(), $color->getG(), $color->getB()));
-			}
-		}
-		return imagepng($img, $filename);
 	}
 
 	public static function getBlockColor(Block $block){
@@ -470,6 +441,47 @@ class API{
 		}
 	}
 
+	public static function exportToPNG(Map $map){
+		if (!extension_loaded("gd")){
+			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
+			var_dump(get_loaded_extensions());
+			return;
+		}
+		$image = imagecreatetruecolor($map->getWidth(), $map->getHeight());
+		imagesavealpha($image, true);
+
+		for ($y = 0; $y < $map->getHeight(); ++$y){
+			for ($x = 0; $x < $map->getWidth(); ++$x){
+				$color = $map->getColorAt($x, $y);
+				imagesetpixel($image, $x, $y, imagecolorallocate/*alpha*/
+				($image, $color->getR(), $color->getG(), $color->getB()/*, $color->getA()*/));
+			}
+		}
+		imagepng($image, Loader::$path['maps_exported'] . '/map_' . $map->getMapId() . '.png');
+	}
+
+	/*public static function exportToPNG(Map $map){
+		if (!extension_loaded("gd")){
+			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
+			var_dump(get_loaded_extensions());
+			return false;
+		}
+		$filename = Loader::$path['maps_exported'] . "/map_" . $map->getMapId() . ".png";
+		$colors = $map->getColors();
+		$width = $map->getWidth();
+		$height = $map->getHeight();
+		$img = imagecreatetruecolor($width, $height);
+		#imagecolortransparent($img, imagecolorallocate($img, 0, 0, 0));
+		for ($y = 0; $y < $height; ++$y){
+			for ($x = 0; $x < $width; ++$x){
+				/** @var Color $color * /
+				$color = $colors[$y][$x];
+				imagesetpixel($img, $x, $y, imagecolorallocate($img, $color->getR(), $color->getG(), $color->getB()));
+			}
+		}
+		return imagepng($img, $filename);
+	}*/
+
 	public function cacheMap(Map $map){//TODO: serialize?
 		self::$cachedMaps[$map->getMapId()] = $map;
 	}
@@ -485,90 +497,63 @@ class API{
 		return self::$cachedMaps;
 	}
 
-	/**
-	 * Returns the closest map color to a Color
-	 * This will ignore alpha
-	 * @param Color $color
-	 * @return Color
-	 */
-	public function getClosestMapColor(Color $color){
-		if ($color->getA() > 128) return self::$MapColors[0];
-
-		$index = 0;
-		$best = -1;
-
-		for ($i = 4; $i < count(self::$MapColors); $i++){
-			$distance = Color::getDistance($color, self::$MapColors[$i]);
-			if ($distance < $best || $best == -1){
-				$best = $distance;
-				$index = $i;
-			}
-		}
-
-		return self::$MapColors[$index];
-	}
-
 	public function exportToNBT(Map $map, string $name){
 		$data = [];
-		for ($i = 0; $i < $map->getWidth(); ++$i){
-			for ($j = 0; $j < $map->getHeight(); ++$j){
-				$c = $map->getColorAt($i, $j);
-				for ($k = 0; $k < count($this->getMapColors()); ++$k){
-					if ($c === $this->getMapColors()[$k]){
-						$data[$i + $j * $map->getWidth()] = $k;
-						break;
-					}
-				}
+		foreach ($map->getColors() as $y => $icolors){
+			foreach ($icolors as $x => $c){
+				/** @var Color $c */
+				$data[$x + ($y * $map->getHeight())] = $c->toABGR();
 			}
 		}
+		#if (count($data) !== $map->getWidth() * $map->getHeight()){
+		#	Server::getInstance()->getLogger()->error("Convert count does not match color count, aborting to save! Got: " . count($data) . " colors, needs " . $map->getWidth() * $map->getHeight() . " colors");
+		#	return false;
+		#}
 		$nbt = new NBT(NBT::BIG_ENDIAN);
-		print __LINE__;
 		$t =
-			new CompoundTag($name,
-				new ShortTag("width", $map->getWidth()),
-				new ShortTag("height", $map->getHeight()),
-				new ByteTag("scale", $map->getScale()),
-				new ByteTag("fullyExplored", 1),//to have transparency instead of the map background
-				new ByteTag("dimension", 0),//maybe todo
-				new IntTag("xCenter", $map->getXOffset()),//maybe todo
-				new IntTag("zCenter", $map->getYOffset()),//maybe todo
-				new ByteArrayTag("colors", $data),
-				new ListTag("decorations", [])
+			new CompoundTag($name, [
+					new ShortTag("width", $map->getWidth()),
+					new ShortTag("height", $map->getHeight()),
+					new ByteTag("scale", $map->getScale()),
+					new ByteTag("fullyExplored", 1),//maybe to have transparency instead of the map background
+					new ByteTag("dimension", 0),//maybe todo
+					new IntTag("xCenter", $map->getXOffset()),//maybe todo
+					new IntTag("zCenter", $map->getYOffset()),//maybe todo
+					new IntArrayTag("colors", $data),
+					new ListTag("decorations", $map->getDecorations())]
 			);
-		print __LINE__;
 		$nbt->setData($t);
-		print __LINE__;
 		file_put_contents(Loader::$path['maps'] . '/map_' . $map->getMapId() . '.dat', $nbt->writeCompressed());
-		print __LINE__;
 		return file_exists(Loader::$path['maps'] . '/map_' . $map->getMapId() . '.dat');
 	}
 
-	public function getMapColors(){//TODO: make static
-		return self::$MapColors;
+	public function getBaseMapColors(){//TODO: make static
+		return self::$BaseMapColors;
 	}
 
-	public function loadFromNBT($id){
-		$path = Loader::$path['maps'] . '/map_' . $id . '.dat';
+	public function loadFromNBT(string $path){
 		if (!file_exists($path)) return false;
+		$id = intval(str_replace(Loader::$path['maps'] . '/map_', '', str_replace('.dat', '', $path)));//todo use regex
 		$map = new Map();
 		$nbt = new NBT(NBT::BIG_ENDIAN);
 		$nbt->readCompressed(file_get_contents($path));
-		$data = $nbt->getData()->data;
-		#Server::getInstance()->getLogger()->debug(var_export($data, true));
+		$data = $nbt->getData();
+		$map->setMapId($id);
 		$map->setWidth($data->width->getValue());
 		$map->setHeight($data->height->getValue());
 		$map->setXOffset($data->xCenter->getValue());
 		$map->setYOffset($data->zCenter->getValue());
 		/** @var Color[][] */
 		$colors = [];
-		$data = unpack('C*', $data->colors->getValue());
+		$colordata = $data->colors->getValue();
 		for ($y = 0; $y < $map->getHeight(); ++$y){
 			for ($x = 0; $x < $map->getWidth(); ++$x){
-				$colors[$y][$x] = $this->getMapColors()[$data[($y * $map->getWidth()) + $x]??0];
+				$colors[$y][$x] = Color::fromABGR($colordata[$x + ($y * $map->getHeight())]??0);
 			}
 		}
 		$map->setColors($colors);
-		//deco
+		Loader::getMapUtils()::exportToPNG($map);
+		//TODO deco
 		return $map;
 	}
 }

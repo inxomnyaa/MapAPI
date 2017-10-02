@@ -2,15 +2,16 @@
 
 namespace xenialdan\MapAPI\item;
 
+use pocketmine\item\Item;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
 use pocketmine\utils\Color;
 use xenialdan\MapAPI\Loader;
 
-class Map{
+class Map extends Item{
 
 	/**
-	 * @var int $id
+	 * @var int $map_id
 	 * @var Color[][] $colors
 	 * @var int $scale
 	 * @var int $width
@@ -19,29 +20,32 @@ class Map{
 	 * @var int $xOffset
 	 * @var int $yOffset
 	 */
-	public $id, $colors = [], $scale, $width, $height, $decorations = [], $xOffset, $yOffset;
+	public $map_id, $colors = [], $scale, $width, $height, $decorations = [], $xOffset, $yOffset;
 
 
-	public function __construct(int $id = -1, array $colors = [], int $scale = 1, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0){
-		$this->setMapId($id);
-		$this->setColors($colors);
-		$this->setScale($scale);
-		$this->setWidth($width);
-		$this->setHeight($height);
-		$this->setDecorations($decorations);
-		$this->setXOffset($xOffset);
-		$this->setYOffset($yOffset);
+	public function __construct(int $map_id = -1, array $colors = [], int $scale = 1, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0){
+		parent::__construct(self::FILLED_MAP, 0, "Filled Map");
+		$this->map_id = $map_id;
+		$this->colors = $colors;
+		$this->scale = $scale;
+		$this->width = $width;
+		$this->height = $height;
+		$this->decorations = $decorations;
+		$this->xOffset = $xOffset;
+		$this->yOffset = $yOffset;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+		Loader::getMapUtils()->cacheMap($this);
 	}
 
 	/**
 	 * @return int $id
 	 */
 	public function getMapId(){
-		return $this->id;
+		return $this->map_id;
 	}
 
-	public function setMapId(int $id){
-		$this->id = $id;
+	public function setMapId(int $map_id){
+		$this->map_id = $map_id;
 		//TODO: update?? i guess resend.. client would request?
 	}
 
@@ -60,6 +64,7 @@ class Map{
 
 	public function setDecorations($decorations){
 		$this->decorations = $decorations;
+		$this->update(ClientboundMapItemDataPacket::BITFLAG_DECORATION_UPDATE);
 	}
 
 	public function addDecoration($decoration){
@@ -117,12 +122,16 @@ class Map{
 		return $this->colors;
 	}
 
+	/**
+	 * Returns a color at a position, transparent black if not found or "out of map"
+	 * @param int $x
+	 * @param int $y
+	 * @return Color
+	 */
 	public function getColorAt(int $x, int $y){
-		#if(isset($this->getColors()[$y]) && isset($this->getColors()[$y][$x]))
-		return $this->getColors()
-		[$y]
-		[$x];
-		#return Loader::getMapUtils()->getMapColors()[0];
+		if (isset($this->getColors()[$y]) && isset($this->getColors()[$y][$x]))
+			return $this->getColors()[$y][$x];
+		return Loader::getMapUtils()->getBaseMapColors()[0];
 	}
 
 	public function setColors(array $colors){
