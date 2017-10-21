@@ -3,6 +3,8 @@
 namespace xenialdan\MapAPI\item;
 
 use pocketmine\item\Item;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
 use pocketmine\utils\Color;
@@ -23,9 +25,9 @@ class Map extends Item{
 	public $map_id, $colors = [], $scale, $width, $height, $decorations = [], $xOffset, $yOffset;
 
 
-	public function __construct(int $map_id = -1, array $colors = [], int $scale = 1, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0){
+	public function __construct(int $map_id = -1, array $colors = [], int $scale = 0, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0){
 		parent::__construct(self::FILLED_MAP, 0, "Filled Map");
-		$this->map_id = $map_id;
+		$this->setMapId($map_id);
 		$this->colors = $colors;
 		$this->scale = $scale;
 		$this->width = $width;
@@ -41,12 +43,12 @@ class Map extends Item{
 	 * @return int $id
 	 */
 	public function getMapId(){
-		return $this->map_id;
+		return intval($this->map_id === -1 ? $this->getNamedTagEntry('map_uuid')->getValue() : $this->map_id);
 	}
 
 	public function setMapId(int $map_id){
 		$this->map_id = $map_id;
-		//TODO: update?? i guess resend.. client would request?
+		$this->setNamedTagEntry(new StringTag("map_uuid", strval($map_id)));
 	}
 
 	public function getScale(){

@@ -33,6 +33,8 @@ use pocketmine\nbt\tag\IntArrayTag;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\ShortTag;
+use pocketmine\nbt\tag\StringTag;
+use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use xenialdan\MapAPI\item\Map;
@@ -441,6 +443,52 @@ class API{
 		}
 	}
 
+	/**
+	 * Imports a map from a png in MapAPI/images. Only pass the basename without extension!
+	 *
+	 * @param $png
+	 * @param int $max Defines the maximum pixels in width/height
+	 * @return bool|Map
+	 */
+	public static function importFromPNG($png, $max = 128){
+		if (!extension_loaded("gd")){
+			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
+			var_dump(get_loaded_extensions());
+			return false;
+		}
+		$colors = [];
+		$image = @imagecreatefrompng(Loader::$path['images']. '/' . $png . '.png');
+		if ($image !== false){
+			$ratio = imagesx($image) / imagesy($image);
+			if ($ratio > 1){
+				$width = $max;
+				$height = $max / $ratio;
+			} else{
+				$width = $max * $ratio;
+				$height = $max;
+			}
+			$image = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
+			$width = imagesx($image);
+			$height = imagesy($image);
+			for ($y = 0; $y < $height; ++$y){
+				for ($x = 0; $x < $width; ++$x){
+					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
+					$colors[$y][$x] =
+						new Color($color['red'], $color['green'], $color['blue'])
+						//new Color($color['red'], $color['green'], $color['blue'], $color['alpha'])
+					;
+				}
+			}
+			$map = new Map(API::getNewId(), $colors, /*128/$max*/ $max/128 - 1, $height, $width);
+			$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
+			Loader::getMapUtils()->cacheMap($map);
+			return $map;
+		} else{
+			Server::getInstance()->getLogger()->error('Wasn\'t able to create or access the png file! Make sure your path is correct!');
+			return false;
+		}
+	}
+
 	public static function exportToPNG(Map $map){
 		if (!extension_loaded("gd")){
 			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
@@ -454,33 +502,11 @@ class API{
 			for ($x = 0; $x < $map->getWidth(); ++$x){
 				$color = $map->getColorAt($x, $y);
 				imagesetpixel($image, $x, $y, imagecolorallocate/*alpha*/
-				($image, $color->getR(), $color->getG(), $color->getB()/*, $color->getA()*/));
+				($image, $color->getR(), $color->getG(), $color->getB()/*, $color->getA()*/));//TODO Alpha fix // 127 vs 255? see skinapi
 			}
 		}
 		imagepng($image, Loader::$path['maps_exported'] . '/map_' . $map->getMapId() . '.png');
 	}
-
-	/*public static function exportToPNG(Map $map){
-		if (!extension_loaded("gd")){
-			Server::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
-			var_dump(get_loaded_extensions());
-			return false;
-		}
-		$filename = Loader::$path['maps_exported'] . "/map_" . $map->getMapId() . ".png";
-		$colors = $map->getColors();
-		$width = $map->getWidth();
-		$height = $map->getHeight();
-		$img = imagecreatetruecolor($width, $height);
-		#imagecolortransparent($img, imagecolorallocate($img, 0, 0, 0));
-		for ($y = 0; $y < $height; ++$y){
-			for ($x = 0; $x < $width; ++$x){
-				/** @var Color $color * /
-				$color = $colors[$y][$x];
-				imagesetpixel($img, $x, $y, imagecolorallocate($img, $color->getR(), $color->getG(), $color->getB()));
-			}
-		}
-		return imagepng($img, $filename);
-	}*/
 
 	public function cacheMap(Map $map){//TODO: serialize?
 		self::$cachedMaps[$map->getMapId()] = $map;

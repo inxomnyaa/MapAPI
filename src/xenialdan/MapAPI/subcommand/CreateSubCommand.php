@@ -3,16 +3,10 @@
 namespace xenialdan\MapAPI\subcommand;
 
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\StringTag;
-use pocketmine\network\mcpe\protocol\ClientboundMapItemDataPacket;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 use xenialdan\MapAPI\API;
-use xenialdan\MapAPI\Color;
 use xenialdan\MapAPI\item\Map;
-use xenialdan\MapAPI\Loader;
 
 class CreateSubCommand extends SubCommand{
 
@@ -48,41 +42,12 @@ class CreateSubCommand extends SubCommand{
 			return false;
 		}
 		$png = str_replace(".png", "", $args[0]);
-		$colors = [];
-		$image = @imagecreatefrompng($this->getPlugin()->getDataFolder() . 'images/' . $png . '.png');
-		if ($image !== false){
-			$ratio = imagesx($image) / imagesy($image);
-			if ($ratio > 1){
-				$width = 128;
-				$height = 128 / $ratio;
-			} else{
-				$width = 128 * $ratio;
-				$height = 128;
-			}
-			$image = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
-			$width = imagesx($image);
-			$height = imagesy($image);
-			#imagepng($image, $this->getPlugin()->getDataFolder() . 'maps_exported/' . $args[0] . '.png');
-			for ($y = 0; $y < $height; ++$y){
-				for ($x = 0; $x < $width; ++$x){
-					$color = imagecolorsforindex($image, imagecolorat($image, $x, $y));
-					$colors[$y][$x] = /*Loader::getMapUtils()->getClosestMapColor(*/
-						new Color($color['red'], $color['green'], $color['blue']/*, $color['alpha']*/)/*)*/
-					;
-				}
-			}
-			$map = new Map($id = API::getNewId(), $colors, 2, $height, $width);
-			$tag = new CompoundTag("", []);
-			$tag->map_uuid = new StringTag("map_uuid", strval($id));
-			$map->setCompoundTag($tag);
+		if (($map = API::importFromPNG($png)) instanceof Map){
+			$player->sendMessage(TextFormat::GREEN . 'Map "' . $png . '", id:' . $map->getMapId(). ' received!');
 			$player->getInventory()->addItem($map);
-			$map->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
-			Loader::getMapUtils()->cacheMap($map);
 		} else{
-			$player->sendMessage(TextFormat::RED . 'Wasn\'t able to create or access the png file! Make sure your path is correct!');
-			return false;
+			$player->sendMessage(TextFormat::RED . 'No file with the name "' . $png . '" exists in the MapAPI/images folder!');
 		}
-		$player->sendMessage(TextFormat::GREEN . 'Map "' . $png . '", id:' . $id . ' received!');
 		return true;
 	}
 }
