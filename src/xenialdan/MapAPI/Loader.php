@@ -28,7 +28,6 @@ class Loader extends PluginBase{
 		ItemFactory::registerItem(new Map(), true);
 		foreach (glob(self::$path['maps'] . '/*.dat') as $mapdata){
 			$map = $this::getMapUtils()->loadFromNBT($mapdata);
-			var_dump($map->getMapId());
 			$this::getMapUtils()->cacheMap($map);
 		}
 	}

@@ -26,6 +26,7 @@ use pocketmine\block\Planks;
 use pocketmine\block\Prismarine;
 use pocketmine\block\Stone;
 use pocketmine\block\StoneSlab;
+use pocketmine\nbt\BigEndianNBTStream;
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\ByteTag;
 use pocketmine\nbt\tag\CompoundTag;
@@ -535,7 +536,7 @@ class API{
 		#	Server::getInstance()->getLogger()->error("Convert count does not match color count, aborting to save! Got: " . count($data) . " colors, needs " . $map->getWidth() * $map->getHeight() . " colors");
 		#	return false;
 		#}
-		$nbt = new NBT(NBT::BIG_ENDIAN);
+		$nbt = new BigEndianNBTStream();
 		$t =
 			new CompoundTag($name, [
 					new ShortTag("width", $map->getWidth()),
@@ -561,7 +562,7 @@ class API{
 		if (!file_exists($path)) return false;
 		$id = intval(str_replace(Loader::$path['maps'] . '/map_', '', str_replace('.dat', '', $path)));//todo use regex
 		$map = new Map();
-		$nbt = new NBT(NBT::BIG_ENDIAN);
+		$nbt = new BigEndianNBTStream();
 		$nbt->readCompressed(file_get_contents($path));
 		$data = $nbt->getData();
 		$map->setMapId($id);
