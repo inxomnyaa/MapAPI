@@ -1,8 +1,8 @@
 ---
 name: MapAPI
 main: xenialdan\MapAPI\Loader
-version: 1.4.0
-api: 3.9.4
+version: 1.4.1
+api: 3.9
 load: POSTWORLD
 authors:
 - XenialDan

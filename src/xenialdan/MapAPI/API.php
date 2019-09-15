@@ -458,14 +458,14 @@ class API
      *
      * @param $png
      * @param int $max Defines the maximum pixels in width/height
-     * @return bool|Map
+     * @return null|Map
      */
-    public static function importFromPNG($png, $max = 128)
+    public static function importFromPNG($png, $max = 128): ?Map
     {
         if (!extension_loaded("gd")) {
             Loader::getInstance()->getLogger()->error("Unable to find the gd extension, can't create PNG image from Map");
             var_dump(get_loaded_extensions());
-            return false;
+            return null;
         }
         $colors = [];
         $image = @imagecreatefrompng(Loader::$path['images'] . '/' . $png . '.png');
@@ -496,7 +496,7 @@ class API
             return $map;
         } else {
             Loader::getInstance()->getLogger()->error('Wasn\'t able to create or access the png file! Make sure your path is correct!');
-            return false;
+            return null;
         }
     }
 

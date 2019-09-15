@@ -23,6 +23,7 @@ class Map extends Item
      * @var int $yOffset
      */
     public $map_id, $colors = [], $scale, $width, $height, $decorations = [], $xOffset, $yOffset;
+    public $changed = true;
 
     public function __construct(int $map_id = -1, array $colors = [], int $scale = 0, int $width = 128, int $height = 128, $decorations = [], int $xOffset = 0, int $yOffset = 0)
     {
@@ -57,6 +58,7 @@ class Map extends Item
             $this->setNamedTagEntry(new StringTag("map_uuid", strval($map_id)));
         } catch (\InvalidArgumentException $e) {
         }
+        $this->changed = true;
     }
 
     public function getScale()
@@ -172,8 +174,10 @@ class Map extends Item
         $this->update(ClientboundMapItemDataPacket::BITFLAG_TEXTURE_UPDATE);
     }
 
+    //TODO optimize
     public function update($type = 0x00)
     {
+        $this->changed = true;
         $pk = new ClientboundMapItemDataPacket();
         $pk->mapId = $this->getMapId();
         $pk->type = $type;
@@ -184,7 +188,7 @@ class Map extends Item
         $pk->height = $this->getHeight();
         $pk->xOffset = $this->getXOffset();
         $pk->yOffset = $this->getYOffset();
-        $pk->colors = $this->getColors();
+        $pk->colors = $this->getColors();//TODO only send changed colors
         try {
             Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $pk);
         } catch (\RuntimeException $e) {
@@ -193,6 +197,7 @@ class Map extends Item
 
     public function save()
     {
+        $this->changed = false;
         return Loader::getMapUtils()->exportToNBT($this, $this->getMapId());
     }
 }

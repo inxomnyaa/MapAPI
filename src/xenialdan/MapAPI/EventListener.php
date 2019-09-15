@@ -26,8 +26,9 @@ class EventListener implements Listener
         LevelSaveEvent $event)
     {
         foreach ($this->owner::getMapUtils()->getAllCachedMaps() as $cachedMap) {
+            if($cachedMap->changed){
             $cachedMap->save();
-            API::exportToPNG($cachedMap);
+            API::exportToPNG($cachedMap);}
         }
     }
 
